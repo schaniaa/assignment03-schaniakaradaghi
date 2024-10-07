@@ -1,24 +1,31 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Front-end tests', () => {
-  test.beforeEach(async ({ page }) => {
+  test('Log in and log out', async ({ page }) => {
     await page.goto('http://localhost:3000/login/');
     await expect(page.getByRole('heading', { name: 'Login' })).toBeVisible();
   
-    await page.locator('input[type="text"]').fill("tester01");
-    await page.locator('input[type="password"]').fill("GteteqbQQgSr88SwNExUQv2ydb7xuf8c");
+    await page.locator('input[type="text"]').fill(`${process.env.TEST_USERNAME}`);
+    await page.locator('input[type="password"]').fill(`${process.env.TEST_PASSWORD}`);
     await page.getByRole('button', { name: 'Login' }).click();
     await page.waitForTimeout(10000);
     await expect(page.getByRole('heading', { name: 'Tester Hotel Overview'})).toBeVisible();
+    
+    //Logga ut
+    await page.getByRole('button', { name: 'Logout' }).click();
+    await page.goto('http://localhost:3000');
+    await expect(page.getByRole('heading', { name: 'Login' })).toBeVisible();
   });
     
-    test('Log in', async ({ page }) => {
-      await expect(page.getByRole('heading', { name: 'Tester Hotel Overview'})).toBeVisible();
-    
-    });
-    
-    
     test('Create client', async ({ page }) => {
+      await page.goto('http://localhost:3000/login/');
+      await expect(page.getByRole('heading', { name: 'Login' })).toBeVisible();
+    
+      await page.locator('input[type="text"]').fill(`${process.env.TEST_USERNAME}`);
+      await page.locator('input[type="password"]').fill(`${process.env.TEST_PASSWORD}`);
+      await page.getByRole('button', { name: 'Login' }).click();
+      await page.waitForTimeout(10000);
+      await expect(page.getByRole('heading', { name: 'Tester Hotel Overview'})).toBeVisible();
     
       await page.locator('div').filter({ hasText: /^ClientsNumber: 2View$/ }).getByRole('link').click();
     
