@@ -39,9 +39,41 @@ test.describe('Front-end tests', () => {
       await expect(page.getByRole('heading', { name: 'Lena Handen'})).toBeVisible();
     });
 
-
-    test('Test case 02 - Backend', async ({ request }) => {
-
+    test.describe('Back-end tests', () => {
+    test('Get all client', async ({ request }) => {
+      const response = await request.post('http://localhost:3000/api/login', {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        data: {
+          username: process.env.TEST_USERNAME,
+          password: process.env.TEST_PASSWORD
+        }
+      });
+    
+      const jsonResponse = await response.json();
+      const accessToken = jsonResponse.token;
+      const username = process.env.TEST_USERNAME;
+      const getPostsResponse = await request.get('http://localhost:3000/api/clients', {
+        headers: {
+          'x-user-auth': JSON.stringify({ 
+            username: username,
+            token: accessToken
+          }),
+          'Content-Type': 'application/json'
+        }
+      });
+      expect(getPostsResponse.ok()).toBeTruthy();
+      expect(getPostsResponse.status()).toBe(200);
+    
+      const getAllClients = await getPostsResponse.json();
+      console.log(getAllClients);
+    });
+    
+    
+    
+    test('Get all rooms', async ({ request }) => {
+    
       const response = await request.post('http://localhost:3000/api/login', {
         headers: {
           'Content-Type': 'application/json',
@@ -71,19 +103,7 @@ test.describe('Front-end tests', () => {
       const getAllRooms = await getPostsResponse.json();
       console.log(getAllRooms);
     
-    });
-
-
-test.describe('Backend tests', () => {
-  test('Create a client', async ({ request }) => {
-    const response = await request.post('http://localhost:3000/api/login', {
-      data:{
-        "username": `${process.env.TEST_USERNAME}`,
-        "password": `${process.env.TEST_PASSWORD}`
-      }      
-    });
-    expect (response.ok()).toBeTruthy();    
-    // Include the rest of the code...
-  });  
-  });  
+    }); 
+  });
 });
+  
